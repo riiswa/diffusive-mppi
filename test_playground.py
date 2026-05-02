@@ -40,7 +40,7 @@ COSTS = {
     'ReacherEasy': lambda s: jnp.where(jnp.linalg.norm(s.obs[2:4]) < 0.06,  0., 1.),
     'ReacherHard': lambda s: jnp.where(jnp.linalg.norm(s.obs[2:4]) < 0.025, 0., 1.),
     'BallInCup': lambda s: 1. - s.reward,
-    'CheetahRun': lambda s: jnp.where(s.reward > 0.1, 0., 1.),
+    'CheetahRun': lambda s: jnp.where(s.reward > 0.25, 0., 1.),
     'FingerSpin':     lambda s: 1. - s.reward,  # already binary
     'FingerTurnEasy': lambda s: 1. - s.reward,  # already binary
     'FingerTurnHard': lambda s: 1. - s.reward,  # already binary, smaller target
@@ -49,6 +49,8 @@ COSTS = {
     'WalkerRun':   lambda s: jnp.where((s.obs[0] > 1.2) & (s.obs[1] > 3.0), 0., 1.),
     'HopperStand': lambda s: jnp.where(s.obs[0] > 0.6, 0., 1.),
 }
+
+MJX_ENVS = ['ReacherEasy', 'ReacherHard']
 
 # ── progress bar ──────────────────────────────────────────────────────────────
 
@@ -149,17 +151,20 @@ def states_to_list(batched_states, seed_idx, T):
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
+# ── main ──────────────────────────────────────────────────────────────────────
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--env', default='CartpoleSwingupSparse')
     args     = parser.parse_args()
     env_name = args.env
 
-    env     = registry.load(env_name, config_overrides={'impl': 'jax'})
+    impl = 'jax' if env_name in MJX_ENVS else 'warp'
+
+    env     = registry.load(env_name, config_overrides={'impl': impl})
     T       = registry.get_default_config(env_name).episode_length
     cost_fn = COSTS.get(env_name, lambda s: 1. - s.reward)
 
-    # sanity check
     _s = jax.jit(env.step)(jax.jit(env.reset)(random.PRNGKey(0)),
                             jnp.zeros(env.action_size))
 
@@ -170,14 +175,22 @@ if __name__ == '__main__':
                        SIGMA_0=SIGMA_0, N=N, PHI_STAR=PHI_STAR,
                        ETA_NU=ETA_NU, NU_MAX=NU_MAX, N_SEEDS=N_SEEDS), f, indent=2)
 
+    # ── MuJoCo renderer setup (shared across both runs) ──────────────────────
+    import mujoco
+    mj_model  = env.mj_model if hasattr(env, 'mj_model') else env.model
+    mj_data   = mujoco.MjData(mj_model)
+    renderer  = mujoco.Renderer(mj_model)
+    ncam      = mj_model.ncam
+    fps       = int(1. / env.dt)
+    print(f'num cameras: {ncam}')
+
     keys = random.split(random.PRNGKey(0), N_SEEDS)
-    fps  = int(1. / env.dt)
 
     for use_dni, label in [(False, 'vanilla'), (True, 'dni')]:
         print(f'\n[{env_name}] {label.upper()}...')
         run                  = make_run(env, cost_fn, use_dni, T)
         states, costs, phis  = run(keys)
-        costs = np.array(costs)   # (N_SEEDS, T)  lower=better, 0=goal
+        costs = np.array(costs)
         phis  = np.array(phis)
 
         np.save(os.path.join(outdir, f'costs_{label}.npy'), costs)
@@ -188,9 +201,21 @@ if __name__ == '__main__':
         cum = costs.sum(1)
         print(f'  sr={sr:5.1f}%  cum_cost={cum.mean():.1f}±{cum.std():.1f}')
 
-        best = int(costs.sum(1).argmin())   # lowest cumulative cost
-        print(f'  Rendering video (best seed={best})...')
-        frames = env.render(states_to_list(states, best, T))
-        mediapy.write_video(os.path.join(outdir, f'video_{label}.mp4'), frames, fps=fps)
+        best        = int(costs.sum(1).argmin())
+        seed_states = states_to_list(states, best, T)   # list of T state structs
+
+        for cam_id in range(ncam):
+            print(f'  Rendering {label} camera {cam_id}...')
+            frames = []
+            for t in range(T):
+                mj_data.qpos[:] = seed_states[t].data.qpos
+                mj_data.qvel[:] = seed_states[t].data.qvel
+                mujoco.mj_forward(mj_model, mj_data)
+                renderer.update_scene(mj_data, camera=cam_id)
+                frames.append(renderer.render())
+            mediapy.write_video(
+                os.path.join(outdir, f'video_{label}_cam{cam_id}.mp4'),
+                frames, fps=fps
+            )
 
     print(f'\nSaved -> {outdir}/')
