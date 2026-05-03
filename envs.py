@@ -112,7 +112,7 @@ ENVS = {
         obs_fn=lambda s: s[0], obs_label='position',
         goal_line=0.45, obs_ylim=(-1.3, 0.65),
         reset_fn=lambda k: jnp.array([random.uniform(k, shape=(), minval=-0.6, maxval=-0.4), 0.]),
-        action_clip=1., state_range=jnp.array([1.8, 0.14]),
+        action_clip=1., state_range=jnp.array([0., 0.14]),
         N=200, max_steps=200, sigma_u=0.5, sigma_0=0.01, lf_beta=2., action_cost=False,
     ),
     'Pendulum': dict(
@@ -122,7 +122,7 @@ ENVS = {
         goal_line=float(jnp.cos(jnp.array(0.2))), obs_ylim=(-1.1, 1.1),
         reset_fn=lambda k: jnp.array([wrap(jnp.pi + random.uniform(k, shape=(), minval=-0.1, maxval=0.1)),
                                        random.uniform(k, shape=(), minval=-0.1, maxval=0.1)]),
-        action_clip=2., state_range=jnp.array([2*jnp.pi, 16.]),
+        action_clip=2., state_range=jnp.array([0., 16.]),
         N=200, max_steps=500, sigma_u=0.5, sigma_0=0.01, lf_beta=2., action_cost=False,
     ),
     'Cartpole': dict(
@@ -132,7 +132,7 @@ ENVS = {
         goal_line=0.95, obs_ylim=(-1.1, 1.1),
         reset_fn=lambda k: jnp.array([random.uniform(k, shape=(), minval=-0.05, maxval=0.05), 0.,
                                        wrap(jnp.pi + random.uniform(k, shape=(), minval=-0.05, maxval=0.05)), 0.]),
-        action_clip=10., state_range=jnp.array([4.8, 10., 2*jnp.pi, 20.]),
+        action_clip=10., state_range=jnp.array([0., 10., 0., 20.]),
         N=200, max_steps=500, sigma_u=1., sigma_0=0.01, lf_beta=2., action_cost=False,
     ),
     # 'Double Cartpole': dict(
@@ -155,7 +155,7 @@ ENVS = {
                                        random.uniform(k, shape=(), minval=-0.1, maxval=0.1),
                                        random.uniform(k, shape=(), minval=-0.1, maxval=0.1),
                                        random.uniform(k, shape=(), minval=-0.1, maxval=0.1)]),
-        action_clip=1., state_range=jnp.array([2*jnp.pi, 2*jnp.pi, 8*jnp.pi, 18*jnp.pi]),
+        action_clip=1., state_range=jnp.array([0., 0., 8*jnp.pi, 18*jnp.pi]),
         N=200, max_steps=500, sigma_u=0.5, sigma_0=0.01, lf_beta=2., action_cost=False,
     ),
     'Furuta': dict(
@@ -166,7 +166,7 @@ ENVS = {
         reset_fn=lambda k: jnp.array([random.uniform(k, shape=(), minval=-jnp.pi, maxval=jnp.pi),
                                        wrap(jnp.pi+random.uniform(k, shape=(), minval=-0.1, maxval=0.1)),
                                        0., 0.]),
-        action_clip=0.1, state_range=jnp.array([2*jnp.pi, 2*jnp.pi, 20., 20.]),
+        action_clip=0.1, state_range=jnp.array([0., 0., 20., 20.]),
         N=200, max_steps=500, sigma_u=0.02, sigma_0=0.01, lf_beta=2., action_cost=False,
     ),
 }

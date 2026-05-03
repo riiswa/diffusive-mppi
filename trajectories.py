@@ -27,10 +27,11 @@ init_state  = jnp.array([-0.5, 0.0])
 def rollout(key, sigma):
     ka, kd = random.split(key)
     actions = random.normal(ka, (T,)) * sigma_u
-    noise   = random.normal(kd, (T, 2)) * (sigma * state_range)
+    noise   = random.normal(kd, (T,)) * (sigma * state_range[1])  # scalar, vel only
     def step(s, inp):
         u, d = inp
-        sn = step_fn(s, u) + d
+        sn = step_fn(s, u)
+        sn = sn.at[1].add(d)  # perturb velocity only
         return sn, sn
     _, traj = jax.lax.scan(step, init_state, (actions, noise))
     return traj  # (T, 2)
@@ -63,6 +64,7 @@ for i, (ax, sigma) in enumerate(zip(axes, SIGMAS)):
     ax.set_yticks([])
 
 plt.tight_layout(w_pad=0.5)
+os.makedirs("figures", exist_ok=True)
 plt.savefig('figures/traj_viz.pdf', bbox_inches='tight', dpi=150)
 plt.savefig('figures/traj_viz.png', bbox_inches='tight', dpi=150)
 print('Saved -> traj_viz.pdf/png')

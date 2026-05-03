@@ -68,7 +68,7 @@ def run_env(env, name):
     for label, sch, adaptive, md_alpha in [
         ('Vanilla',     sch_white, False, 0.),
         ('LF-MPPI',     sch_color, False, 0.),
-        ('MaxDiff',     sch_white, False, MAXDIFF_ALPHA),
+        # ('MaxDiff',     sch_white, False, MAXDIFF_ALPHA),
         ('DNI-MPPI',    sch_white, True,  0.),
         ('DNI-LF-MPPI', sch_color, True,  0.),
     ]:

@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 from envs import ENVS
 
 # ── config ────────────────────────────────────────────────────────────────────
-K        = 1_000
+K        = 500
 N_SEEDS  = 256
-N_SIGMA  = 200
+N_SIGMA  = 500
 SIGMAS   = np.geomspace(1e-3, 1., N_SIGMA)
 LAM      = 0.05
 SEED     = 42
