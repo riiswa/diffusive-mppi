@@ -10,7 +10,7 @@ Usage:
 """
 
 import os, sys, json, argparse
-os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+# os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
 os.environ['MUJOCO_GL'] = 'egl'
 
 import jax
@@ -53,7 +53,7 @@ ETA_NU   = 0.10
 NU_MAX   = 5.0
 N_SEEDS  = 16
 
-MJX_ENVS = ["ReacherEasy", "ReacherHard"]
+MJX_ENVS = []
 
 # ── methods: (sigma_0, beta) ──────────────────────────────────────────────────
 # vanilla   sigma_0=0      beta=0    → white noise, no state noise
@@ -122,12 +122,32 @@ GCRL_ENVS = {
     'arm_binpick_easy', 'arm_binpick_hard', 'arm_binpick_easy_eef',
 }
 
+NACONMAX_CONFIGS = {
+    "HopperHop": 200000,
+    "HopperStand": 200000,
+    "WalkerStand": 150000,
+    "WalkerWalk": 150000,
+    "WalkerRun": 200000,
+    "BallInCup": 100000,
+    "HumanoidStand": 600000,
+    "HumanoidWalk": 750000,
+    "HumanoidRun": 750000,
+}
+
 
 def load_any_env(env_name):
     if env_name in GCRL_ENVS:
         return load_gcrl_env(env_name)
-    impl = 'jax' if env_name in MJX_ENVS else 'warp'
-    return registry.load(env_name, config_overrides={'impl': impl})
+    config_overrides = {}
+    config_overrides['impl'] = 'jax' if env_name in MJX_ENVS else 'warp'
+    if env_name in NACONMAX_CONFIGS.keys():
+        config_overrides['naconmax'] = NACONMAX_CONFIGS[env_name]
+    if "Reacher" in env_name :
+        config_overrides['njmax'] = 1
+    return registry.load(
+        env_name,
+        config_overrides=config_overrides
+    )
 
 
 def get_episode_length(env_name, env):
@@ -155,8 +175,8 @@ COSTS = {
     'FingerTurnEasy': lambda s: 1. - s.reward,
     'FingerTurnHard': lambda s: 1. - s.reward,
     'FishSwim':       lambda s: jnp.where(jnp.linalg.norm(s.obs[8:11]) < 0.1, 0., 1.),
-    'HopperStand':    lambda s: jnp.where(s.obs[0] > 0.6, 0., 1.),
-    'HopperHop':      lambda s: jnp.where((s.obs[0] > 0.6) & (s.obs[6] > 2.0), 0., 1.),
+    'HopperStand': lambda s: jnp.where(s.reward > 0.5, 0., 1.),
+    'HopperHop':   lambda s: jnp.where(s.reward > 0.5, 0., 1.),
     'HumanoidStand':  lambda s: jnp.where((s.obs[21] > 1.4) & (s.obs[36] > 0.9), 0., 1.),
     'HumanoidWalk':   lambda s: jnp.where((s.obs[21] > 1.4) & (s.obs[36] > 0.9) & (jnp.linalg.norm(s.obs[37:39]) > 1.0), 0., 1.),
     'HumanoidRun':    lambda s: jnp.where((s.obs[21] > 1.4) & (s.obs[36] > 0.9) & (jnp.linalg.norm(s.obs[37:39]) > 3.0), 0., 1.),
