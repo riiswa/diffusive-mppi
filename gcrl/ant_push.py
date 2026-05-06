@@ -21,7 +21,7 @@ def default_config() -> config_dict.ConfigDict:
         action_repeat=1,
         vision=False,
         impl="warp",
-        naconmax=100_000,
+        naconmax=200_000,
         njmax=150,
     )
 

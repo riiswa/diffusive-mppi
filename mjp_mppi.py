@@ -43,11 +43,11 @@ from manipulation.arm_binpick_easy_eef import ArmBinpickEasyEEF
 
 # ── hyperparameters ───────────────────────────────────────────────────────────
 K        = 500
-LAM      = 0.05
-SIGMA_U  = 1.0
+LAM      = 0.1
+SIGMA_U  = 0.25
 SIGMA_0  = 0.01
 BETA     = 2.0      # color exponent for LF variants
-N        = 100
+N        = 50
 PHI_STAR = 0.25
 ETA_NU   = 0.10
 NU_MAX   = 5.0
@@ -104,11 +104,11 @@ def load_gcrl_env(env_name):
         return HumanoidMaze(maze_layout_name=_maze_layout(env_name),
                             config=humanoid_maze_cfg(), config_overrides=ov)
     if env_name == 'arm_reach':            return ArmReach(arm_cfg(), ov)
-    if env_name == 'arm_grasp':            return ArmGrasp(arm_cfg(), ov)
-    if env_name == 'arm_push_easy':        return ArmPushEasy(arm_cfg(), ov)
-    if env_name == 'arm_push_hard':        return ArmPushHard(arm_cfg(), ov)
-    if env_name == 'arm_binpick_easy':     return ArmBinpickEasy(arm_cfg(), ov)
-    if env_name == 'arm_binpick_hard':     return ArmBinpickHard(arm_cfg(), ov)
+    if env_name == 'arm_grasp':            return ArmGrasp(arm_cfg(200_000), ov)
+    if env_name == 'arm_push_easy':        return ArmPushEasy(arm_cfg(200_000), ov)
+    if env_name == 'arm_push_hard':        return ArmPushHard(arm_cfg(200_000), ov)
+    if env_name == 'arm_binpick_easy':     return ArmBinpickEasy(arm_cfg(500_000), ov)
+    if env_name == 'arm_binpick_hard':     return ArmBinpickHard(arm_cfg(500_000), ov)
     if env_name == 'arm_binpick_easy_eef': return ArmBinpickEasyEEF(arm_cfg(), ov)
     raise ValueError(f'Unknown GCRL env: {env_name!r}')
 
@@ -125,9 +125,9 @@ GCRL_ENVS = {
 NACONMAX_CONFIGS = {
     "HopperHop": 200000,
     "HopperStand": 200000,
-    "WalkerStand": 150000,
-    "WalkerWalk": 150000,
-    "WalkerRun": 200000,
+    "WalkerStand": 200000,
+    "WalkerWalk": 200000,
+    "WalkerRun": 250000,
     "BallInCup": 100000,
     "HumanoidStand": 600000,
     "HumanoidWalk": 750000,
@@ -170,7 +170,7 @@ COSTS = {
     'ReacherEasy':    lambda s: jnp.where(jnp.linalg.norm(s.obs[2:4]) < 0.06,  0., 1.),
     'ReacherHard':    lambda s: jnp.where(jnp.linalg.norm(s.obs[2:4]) < 0.025, 0., 1.),
     'BallInCup':      lambda s: 1. - s.reward,
-    'CheetahRun':     lambda s: jnp.where(s.reward > 0.25, 0., 1.),
+    'CheetahRun':     lambda s: jnp.where(s.reward > 0.2, 0., 1.),
     'FingerSpin':     lambda s: 1. - s.reward,
     'FingerTurnEasy': lambda s: 1. - s.reward,
     'FingerTurnHard': lambda s: 1. - s.reward,

@@ -12,7 +12,7 @@ from mujoco import mjx
 from mujoco_playground._src import mjx_env
 
 
-def default_config() -> config_dict.ConfigDict:
+def default_config(naconmax=100_000) -> config_dict.ConfigDict:
     return config_dict.create(
         ctrl_dt=0.05,       # n_frames=25 * sim_dt=0.002
         sim_dt=0.002,
@@ -20,7 +20,7 @@ def default_config() -> config_dict.ConfigDict:
         action_repeat=1,
         vision=False,
         impl="warp",
-        naconmax=100_000,
+        naconmax=naconmax,
         njmax=200,
     )
 
