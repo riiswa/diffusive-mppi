@@ -46,11 +46,11 @@ MAXDIFF_ALPHA = 1.0
 MAXDIFF_EPS   = 1e-3
 
 PALETTE = {
-    'Vanilla':      'steelblue',
+    'MPPI':      'steelblue',
+    'Diffusive MPPI (ours)':     'darkorange',
     'LF-MPPI':      'seagreen',
-    'MaxDiff':      'crimson',
-    'DNI-MPPI':     'darkorange',
-    'DNI-LF-MPPI':  'purple',
+    # 'MaxDiff':      'crimson',
+    'Diffusive LF-MPPI (ours)':  'purple',
 }
 
 keys = random.split(random.PRNGKey(SEED), N_SEEDS)
@@ -66,11 +66,11 @@ def run_env(env, name):
 
     out = {}
     for label, sch, adaptive, md_alpha in [
-        ('Vanilla',     sch_white, False, 0.),
+        ('MPPI',     sch_white, False, 0.),
         ('LF-MPPI',     sch_color, False, 0.),
         # ('MaxDiff',     sch_white, False, MAXDIFF_ALPHA),
-        ('DNI-MPPI',    sch_white, True,  0.),
-        ('DNI-LF-MPPI', sch_color, True,  0.),
+        ('Diffusive MPPI (ours)',    sch_white, True,  0.),
+        ('Diffusive LF-MPPI (ours)', sch_color, True,  0.),
     ]:
         ps = PHI_STAR if adaptive else 0.
         en = ETA_NU   if adaptive else 0.
@@ -136,11 +136,11 @@ def plot_nu(env_dict, sparse_results, fname):
         res = sparse_results[name]
         T   = int(env['max_steps'])
         t   = np.arange(T)
-        for label in ('DNI-MPPI', 'DNI-LF-MPPI'):
+        for label in ('Diffusive MPPI (ours)', 'Diffusive LF-MPPI (ours)'):
             nu     = res[label]['nus']          # (n_seeds, T)
             mu_nu  = nu.mean(0)
             std_nu = nu.std(0)
-            ax.plot(t, mu_nu, color=PALETTE[label], lw=1.5, label=label)
+            ax.plot(t, mu_nu, color=PALETTE[label], lw=1.5, label=label.replace(" (ours)", ""))
             ax.fill_between(t, mu_nu - std_nu, mu_nu + std_nu,
                             color=PALETTE[label], alpha=0.15)
         ax.set_title(name, fontsize=16)

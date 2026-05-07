@@ -193,13 +193,6 @@ ENVS_DENSE = {
         cost_fn=lambda s: jnp.clip((1.-jnp.cos(s[2]))/2.+0.1*(s[0]/2.4)**2, 0., 1.),
         action_cost=True,
     ),
-    # 'Double Cartpole': dict(
-    #     **{k: v for k, v in ENVS['Double Cartpole'].items()
-    #        if k not in ('cost_fn', 'action_cost')},
-    #     cost_fn=lambda s: jnp.clip(
-    #         (1.-jnp.cos(s[2]))/2.*0.45+(1.-jnp.cos(s[4]))/2.*0.45+0.1*(s[0]/2.4)**2, 0., 1.),
-    #     action_cost=True,
-    # ),
     'Acrobot': dict(
         **{k: v for k, v in ENVS['Acrobot'].items()
            if k not in ('cost_fn', 'action_cost')},

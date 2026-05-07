@@ -30,23 +30,17 @@ ENVS=(
     "WalkerWalk"
     "WalkerRun"
     "FingerSpin"
-    "FingerTurnEasy"
-    "FingerTurnHard"
-#    "FishSwim"
+#    "FingerTurnEasy"
+#    "FingerTurnHard"
     "SwimmerSwimmer6"
-    # playground — heavy
-#    "HumanoidStand"
-#    "HumanoidWalk"
-#    "HumanoidRun"
     # gcrl — locomotion
     "ant"
     "ant_ball"
-    "ant_push"
-#    "humanoid"
+#    "ant_push"
     # gcrl — mazes
     "ant_u_maze"
     "ant_big_maze"
-    "ant_hardest_maze"
+#    "ant_hardest_maze"
 #    "humanoid_u_maze"
 #    "humanoid_big_maze"
 #    "humanoid_hardest_maze"
@@ -57,6 +51,12 @@ ENVS=(
     "arm_grasp"
     "arm_binpick_easy"
     "arm_binpick_hard"
+    "FishSwim"
+    # playground — heavy
+    "HumanoidStand"
+    "HumanoidWalk"
+    "HumanoidRun"
+    "humanoid"
 )
 
 TOTAL=${#ENVS[@]}

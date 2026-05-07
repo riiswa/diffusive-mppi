@@ -10,7 +10,7 @@ Usage:
 """
 
 import os, sys, json, argparse
-# os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+
 os.environ['MUJOCO_GL'] = 'egl'
 
 import jax
