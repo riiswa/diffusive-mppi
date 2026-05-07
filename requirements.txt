@@ -1,0 +1,5 @@
+jax
+numpy
+matplotlib
+mujoco-playground
+mediapy
