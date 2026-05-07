@@ -30,20 +30,13 @@ ENVS=(
     "WalkerWalk"
     "WalkerRun"
     "FingerSpin"
-#    "FingerTurnEasy"
-#    "FingerTurnHard"
     "SwimmerSwimmer6"
     # gcrl — locomotion
     "ant"
     "ant_ball"
-#    "ant_push"
     # gcrl — mazes
     "ant_u_maze"
     "ant_big_maze"
-#    "ant_hardest_maze"
-#    "humanoid_u_maze"
-#    "humanoid_big_maze"
-#    "humanoid_hardest_maze"
     # gcrl — manipulation
     "arm_reach"
     "arm_push_easy"
